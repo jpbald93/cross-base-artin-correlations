@@ -21,10 +21,14 @@ echo "== named manuscript"
 cd "$ROOT/paper"
 for i in 1 2 3; do pdflatex -interaction=nonstopmode crossbase_artin.tex >/dev/null 2>&1; done
 BOX=$(grep -cE '^(Overfull|Underfull)' crossbase_artin.log || true)
+OVH=$(grep -cE '^Overfull \\hbox' crossbase_artin.log || true)
 UND=$(grep -ciE 'undefined|multiply.defined' crossbase_artin.log || true)
 PAGES=$(pdfinfo crossbase_artin.pdf | awk '/^Pages/{print $2}')
-echo "   pages=$PAGES badboxes=$BOX undefined=$UND"
+echo "   pages=$PAGES badboxes=$BOX (overfull hbox: $OVH) undefined=$UND"
 [ "$UND" = "0" ] || { echo "FAIL: undefined references"; exit 1; }
+# Overfull \hbox means text overflows the margin: fatal. Underfull \hbox and
+# Overfull \vbox are page-break/hyphenation artefacts: reported, tolerated.
+[ "$OVH" = "0" ] || { echo "FAIL: overfull \\hbox (text overflows the margin)"; exit 1; }
 cp crossbase_artin.pdf "$SUB/crossbase_artin_manuscript.pdf"
 
 echo "== anonymous manuscript"
@@ -72,7 +76,12 @@ PY
 cd "$WORK"
 for i in 1 2 3; do pdflatex -interaction=nonstopmode anon.tex >/dev/null 2>&1; done
 APAGES=$(pdfinfo anon.pdf | awk '/^Pages/{print $2}')
-[ "$APAGES" = "$PAGES" ] || { echo "FAIL: anon page count $APAGES != $PAGES"; exit 1; }
+# Removing the author block legitimately shifts pagination by up to one page, so
+# assert a content-level invariant rather than exact page equality.
+D=$((APAGES - PAGES)); [ "${D#-}" -le 1 ] || { echo "FAIL: anon page count $APAGES vs named $PAGES differ by more than 1"; exit 1; }
+NSEC=$(grep -c '^\\section{' "$TEX" || true)
+ASEC=$(grep -c '^\\section{' "$WORK/anon.tex" || true)
+[ "$NSEC" = "$ASEC" ] || { echo "FAIL: anon section count $ASEC != $NSEC"; exit 1; }
 pdftotext -layout anon.pdf anon.txt
 if grep -qiE 'josh|bald|jpbald93|0009-0002-1317-6489|github\.com/jpbald93|ontario|canada' anon.txt; then
   echo "FAIL: identifying text in anonymous PDF"; grep -niE 'josh|bald|jpbald93|ontario|canada' anon.txt | head; exit 1

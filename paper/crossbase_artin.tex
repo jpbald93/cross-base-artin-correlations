@@ -384,8 +384,8 @@ Theorem~\ref{thm:pair}.
 Within any multiplicative triple --- for instance $(2, 5, 10)$, $(3, 5, 15)$,
 $(3, 7, 21)$, $(2, 3, 6)$ --- an \emph{odd} prime can be Artin for at most two
 of the three bases. The restriction to odd $p$ is necessary and not cosmetic:
-every odd integer is vacuously a primitive root modulo $2$, so all three
-members of $(3,5,15)$ are Artin base $2$.
+every odd integer is vacuously a primitive root modulo $2$, so the prime $2$
+is Artin base $3$, base $5$ and base $15$.
 \end{corollary}
 
 The gain in passing from Theorem~\ref{thm:triple} to Theorem~\ref{thm:pair} is
@@ -409,9 +409,11 @@ root, so the conclusion is immediate. The same remark disposes of $c = 1$ in
 Theorem~\ref{thm:triple}, which arises whenever $\sqf(a) = \sqf(b)$. The
 hypothesis $p \ne 2$ must however be kept, and is not removable:
 $(\Z/2\Z)^\times$ is trivial, so every odd integer is vacuously a primitive
-root mod $2$ and e.g.\ $(a,b,c) = (3,5,15)$ violates the conclusion there. The accompanying Lean formalisation (Section~\ref{sec:theorem}) confirms
-independently that the $a \not\equiv 0$ and $b \not\equiv 0 \pmod p$
-assumptions are never used.
+root mod $2$ and e.g.\ $(a,b,c) = (3,5,15)$ violates the conclusion there. The accompanying Lean formalisation (Section~\ref{sec:theorem}) proves the
+character-parity core of both theorems together with selected concrete
+instances; the statements it checks retain explicit nonvanishing hypotheses on
+the bases (discharged in those instances), and it does not formalise a generic
+squarefree-part-to-witness bridge.
 \end{remark}
 
 \begin{remark}
@@ -468,9 +470,13 @@ signature
 a partition of the primes into at most $4 \cdot 32 \cdot 4 = 512$ cells (for
 odd $p$ we always have $v_2(p-1) \ge 1$, so the truncated valuation takes four
 values, not five). The
-signature records exactly the information about $p-1$ that the Artin
-criterion consults for small bases: the $2$-part and the small odd prime
-divisors. A separate run, also to $10^9$ ($50{,}847{,}524$ primes), stratified
+signature is a coarse summary of the part of $p-1$ that the Artin criterion
+consults first for small bases --- the $2$-part, the small odd prime divisors,
+and a truncated count of the larger factors. It records neither all prime
+divisors of $p-1$ nor the power-residue outcomes that the criterion actually
+tests, and so does not determine Artin status: the primes $139$ and $223$ have
+the same signature and the same $\bigl(\tfrac{10}{p}\bigr) = -1$, yet
+$\operatorname{ord}_{139}(10) = 46$ and $\operatorname{ord}_{223}(10) = 222$. A separate run, also to $10^9$ ($50{,}847{,}524$ primes), stratified
 each pair additionally by the quadratic-residue statuses
 $\bigl(\chi_a(p), \chi_b(p)\bigr)$ of the two bases on top of the signature.
 The whole computation runs in under two hours on a single core of a
@@ -671,9 +677,12 @@ $p-1$ than $\omega(p-1)$.
 We regard this as the main statistical finding: \emph{cross-base Artin
 correlation at a single prime is, to first order, not an interaction between
 the bases at all}. It is a common-cause effect of the shared integer $p - 1$.
-Any model that treats $\Art_a$ and $\Art_b$ as conditionally independent
-given the small-prime structure of $p-1$ reproduces $95\%$ of the observed
-association.
+A model that reproduces the observed within-signature conditional marginals
+and the observed signature frequencies --- equivalently, one in which the two
+indicators are conditionally independent given the signature --- accounts for
+$95\%$ of the observed mean association. Conditional independence alone is not
+enough: an independent model with constant cell probabilities is an immediate
+counterexample.
 
 \section{The residual and the exclusion law}
 \label{sec:entanglement}
@@ -732,9 +741,9 @@ entanglement phenomenon seen from the other side: $\sqf(6) = 2 \cdot 3$. The rel
 resulting near-determinism inside those cells. (The effect is sharpest in the cells where $p-1$ has no small odd prime factor
 at all: for $v_2(p-1) = 1$, no prime $q \le 13$ dividing $p-1$ and exactly one
 larger factor, the $2 \times 2$ table for $(2,6)$ is exactly diagonal over
-$1{,}775{,}686$ primes, giving $\phi = +1$. Across the $44$ cells with
-$v_2(p-1) = 1$ and $3 \nmid p-1$ the within-cell $\phi$ ranges from $+0.39$ to
-$+0.98$, so the near-determinism is a feature of that family of cells rather
+$1{,}775{,}686$ primes, giving $\phi = +1$. Across the $47$ cells with
+$v_2(p-1) = 1$, $3 \nmid p-1$ and at least $200$ primes, the within-cell $\phi$
+ranges from $+0.39$ to $+0.98$, so the near-determinism is a feature of that family of cells rather
 than of a single one.) The triple-completed-group mean absolute residual of $0.0179$ is
 substantially driven by this one pair: excluding it, the figure is $0.0077$,
 still eightfold the value for the remaining pairs of $0.0010$. Conditioning
@@ -1061,7 +1070,8 @@ Acta Arith. \textbf{29} (1976), no.~2, 113--146.
 \bibitem{Moree2012}
 P.~Moree,
 \emph{Artin's primitive root conjecture --- a survey},
-Integers \textbf{12A} (2012), Article A13, 100~pp.
+Integers \textbf{12A} (2012), Article A13, 100~pp.;
+doi:10.1515/integers-2012-0043.
 
 \bibitem{Sgobba2025}
 P.~Sgobba,
