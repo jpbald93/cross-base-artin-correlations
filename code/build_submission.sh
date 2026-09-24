@@ -61,6 +61,9 @@ s = s.replace('jpbald93@gmail.com', 'email withheld for review')
 s = s.replace('0009-0002-1317-6489', 'ORCID withheld for review')
 s = re.sub(r'https?://github\.com/jpbald93/[^\s}{,)]*', 'repository URL withheld for review', s)
 s = s.replace('jpbald93', 'withheld')
+# Own Zenodo records resolve to the author's name and ORCID: remove them from the blind copy.
+s = re.sub(r'\\href\{https://doi\.org/10\.5281/zenodo\.\d+\}\{doi:10\.5281/zenodo\.\d+\}', 'DOI withheld for review', s)
+s = re.sub(r'10\.5281/zenodo\.\d+', 'DOI withheld for review', s)
 # Self-citations: this paper cites two companion preprints by the same author.
 # Blind review requires those to be anonymised in the bibliography too, in the
 # standard way (cited as anonymous companion work, author name removed).
@@ -83,7 +86,7 @@ NSEC=$(grep -c '^\\section{' "$TEX" || true)
 ASEC=$(grep -c '^\\section{' "$WORK/anon.tex" || true)
 [ "$NSEC" = "$ASEC" ] || { echo "FAIL: anon section count $ASEC != $NSEC"; exit 1; }
 pdftotext -layout anon.pdf anon.txt
-if grep -qiE 'josh|bald|jpbald93|0009-0002-1317-6489|github\.com/jpbald93|ontario|canada' anon.txt; then
+if grep -qiE 'josh|bald|jpbald93|0009-0002-1317-6489|github\.com/jpbald93|zenodo\.[0-9]|ontario|canada' anon.txt; then
   echo "FAIL: identifying text in anonymous PDF"; grep -niE 'josh|bald|jpbald93|ontario|canada' anon.txt | head; exit 1
 fi
 pdfinfo anon.pdf > anon_meta.txt
