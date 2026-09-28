@@ -5,7 +5,7 @@
 -- TripleExclusion.lean      triple exclusion (Theorem 2).
 -- PrimitiveRootBridge.lean  primitive root => quadratic non-residue bridge.
 -- Bridge.lean, Basic.lean   shared infrastructure.
--- Check.lean                axiom-dependency audit: every audited theorem must
+-- Check.lean                dependency audit: every audited theorem must
 --                           report only propext, Classical.choice, Quot.sound.
 import Artin.Basic
 import Artin.Bridge
